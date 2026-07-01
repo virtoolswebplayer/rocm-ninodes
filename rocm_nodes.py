@@ -886,6 +886,10 @@ class ROCMOptimizedVAEDecode:
             )
         )
 
+        # ── Pre-decode cleanup ────────────────────────────────────────────────
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         result = comfy.utils.tiled_scale(
             samples, 
             decode_fn, 
@@ -1010,6 +1014,9 @@ class ROCMOptimizedVAEDecodeTiled:
         
         # Use VAE's tiled decode with optimizations
         compression = vae.spacial_compression_decode()
+        # ── Pre-decode cleanup ────────────────────────────────────────────────
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         images = vae.decode_tiled(
             samples["samples"], 
             tile_x=tile_size // compression, 

@@ -575,6 +575,10 @@ class ROCMOptimizedVAEDecode:
                 result = result[0]
             return result
 
+        # ── Pre-decode cleanup ────────────────────────────────────────────────
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         device = vae.device if hasattr(vae, 'device') else (
             samples.device if hasattr(samples, 'device') else (
                 torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -815,6 +819,9 @@ class ROCMOptimizedVAEDecodeTiled:
             temporal_overlap = None
 
         compression = vae.spacial_compression_decode()
+        # ── Pre-decode cleanup ────────────────────────────────────────────────
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         images = vae.decode_tiled(
             samples["samples"],
             tile_x=tile_size // compression,
